@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="ms">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f766e">
+  <meta name="description" content="Kalkulator PCB dan cukai pendapatan individu Malaysia Tahun Taksiran 2026, direka untuk telefon.">
+  <title>Kalkulator Cukai 2026</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar__inner">
+      <div>
+        <h1>Kalkulator Cukai</h1>
+        <p class="sub">PCB & cukai individu · Tahun Taksiran 2026</p>
+      </div>
+      <button id="btnReset" class="icon-btn" type="button" aria-label="Set semula">↺</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <!-- 1. Maklumat diri -->
+    <section class="card" id="sec-diri">
+      <h2><span class="step">1</span> Maklumat diri</h2>
+
+      <div class="field">
+        <label>Status</label>
+        <div class="seg" role="radiogroup" aria-label="Kategori">
+          <label><input type="radio" name="kategori" value="1" checked><span>Bujang</span></label>
+          <label><input type="radio" name="kategori" value="2"><span>Kahwin, pasangan tak bekerja</span></label>
+          <label><input type="radio" name="kategori" value="3"><span>Kahwin, pasangan bekerja</span></label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="bulan">Bulan gaji</label>
+        <select id="bulan"></select>
+      </div>
+
+      <div class="toggles">
+        <label class="toggle"><input type="checkbox" id="oku"><span>Saya OKU</span></label>
+        <label class="toggle" id="rowPasanganOKU" hidden><input type="checkbox" id="pasanganOKU"><span>Pasangan OKU</span></label>
+      </div>
+
+      <details class="sub-block" id="anakBlock">
+        <summary>Anak <span class="badge" id="anakBadge">0</span></summary>
+        <div id="anakList"></div>
+        <div class="field" id="rowPeratusAnak" hidden>
+          <label>Pembahagian tuntutan anak dengan pasangan</label>
+          <div class="seg">
+            <label><input type="radio" name="peratusAnak" value="100" checked><span>Saya tuntut 100%</span></label>
+            <label><input type="radio" name="peratusAnak" value="50"><span>Kongsi 50%</span></label>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <!-- 2. Pendapatan -->
+    <section class="card" id="sec-gaji">
+      <h2><span class="step">2</span> Gaji bulan ini</h2>
+
+      <div class="field">
+        <label for="gaji">Gaji kasar bulanan (RM)</label>
+        <input id="gaji" type="text" inputmode="decimal" placeholder="contoh 5000" autocomplete="off">
+        <small>Termasuk elaun bercukai. Belum ditolak KWSP.</small>
+      </div>
+
+      <div class="field">
+        <label>Caruman KWSP pekerja</label>
+        <div class="row">
+          <div class="seg seg--small">
+            <label><input type="radio" name="kwspMod" value="11" checked><span>11%</span></label>
+            <label><input type="radio" name="kwspMod" value="9"><span>9%</span></label>
+            <label><input type="radio" name="kwspMod" value="0"><span>Tiada</span></label>
+            <label><input type="radio" name="kwspMod" value="manual"><span>RM</span></label>
+          </div>
+          <input id="kwsp" type="text" inputmode="decimal" placeholder="RM" aria-label="KWSP bulan ini (RM)" hidden>
+        </div>
+        <small id="kwspHint"></small>
+      </div>
+
+      <div class="field">
+        <label for="zakat">Zakat bulan ini melalui majikan (RM)</label>
+        <input id="zakat" type="text" inputmode="decimal" placeholder="0" autocomplete="off">
+      </div>
+
+      <details class="sub-block">
+        <summary>Bonus / pendapatan tambahan bulan ini</summary>
+        <div class="field">
+          <label for="bonus">Jumlah bonus, komisen, tunggakan (RM)</label>
+          <input id="bonus" type="text" inputmode="decimal" placeholder="0" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="kwspBonus">KWSP ke atas bonus (RM)</label>
+          <input id="kwspBonus" type="text" inputmode="decimal" placeholder="auto ikut % KWSP" autocomplete="off">
+        </div>
+      </details>
+
+      <details class="sub-block">
+        <summary>Bulan-bulan sebelum (terkumpul) <span class="badge" id="terkumpulBadge">auto</span></summary>
+        <label class="toggle"><input type="checkbox" id="autoTerkumpul" checked><span>Anggar automatik (gaji sama setiap bulan)</span></label>
+        <div id="terkumpulFields">
+          <div class="grid2">
+            <div class="field"><label for="gajiTerkumpul">Gaji kasar terkumpul</label><input id="gajiTerkumpul" type="text" inputmode="decimal"></div>
+            <div class="field"><label for="kwspTerkumpul">KWSP terkumpul</label><input id="kwspTerkumpul" type="text" inputmode="decimal"></div>
+            <div class="field"><label for="pcbTerkumpul">PCB telah dibayar</label><input id="pcbTerkumpul" type="text" inputmode="decimal"></div>
+            <div class="field"><label for="zakatTerkumpul">Zakat terkumpul</label><input id="zakatTerkumpul" type="text" inputmode="decimal"></div>
+          </div>
+          <div class="field"><label for="tp1Terkumpul">Pelepasan TP1 terkumpul (bulan sebelum)</label><input id="tp1Terkumpul" type="text" inputmode="decimal" placeholder="0"></div>
+          <small>Ambil dari slip gaji terakhir: jumlah "Year to date".</small>
+        </div>
+      </details>
+    </section>
+
+    <!-- 3. Pelepasan -->
+    <section class="card" id="sec-pelepasan">
+      <h2><span class="step">3</span> Pelepasan lain (TP1) <span class="badge" id="tp1Badge">RM 0</span></h2>
+      <p class="muted">Pelepasan yang anda bayar sendiri. Masukkan jumlah untuk tahun ini; had maksimum dikira automatik. Pelepasan individu RM9,000 dan KWSP sudah diambil kira.</p>
+      <div id="tp1List"></div>
+    </section>
+
+    <!-- 4. Keputusan -->
+    <section class="card card--result" id="sec-result">
+      <h2><span class="step">4</span> Keputusan</h2>
+
+      <div class="hero">
+        <div class="hero__label">PCB bulan ini</div>
+        <div class="hero__value" id="outPCB">RM 0.00</div>
+        <div class="hero__note" id="outPCBNote"></div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><span>Gaji bersih anggaran</span><strong id="outBersih">—</strong></div>
+        <div class="stat"><span>Pendapatan bercukai setahun</span><strong id="outP">—</strong></div>
+        <div class="stat"><span>Cukai setahun</span><strong id="outCukai">—</strong></div>
+        <div class="stat"><span>Kadar efektif</span><strong id="outKadar">—</strong></div>
+      </div>
+
+      <div class="notice" id="outBaki"></div>
+
+      <details class="sub-block">
+        <summary>Pecahan pengiraan</summary>
+        <table class="tbl" id="tblPecahan"></table>
+      </details>
+
+      <details class="sub-block">
+        <summary>Tangga cukai yang dikenakan</summary>
+        <table class="tbl" id="tblTangga"></table>
+      </details>
+    </section>
+
+    <footer class="foot">
+      <p>Pengiraan mengikut Kaedah Pengiraan Berkomputer PCB LHDN dan kadar cukai TT 2026. Anggaran sahaja; rujuk <a href="https://calcpcbplus.hasil.gov.my/" target="_blank" rel="noopener">e-PCB Plus LHDN</a> untuk pengiraan rasmi. Data anda disimpan dalam telefon ini sahaja.</p>
+    </footer>
+  </main>
+
+  <!-- Bar ringkasan melekat -->
+  <div class="sticky" id="sticky">
+    <div>
+      <div class="sticky__label">PCB bulan ini</div>
+      <div class="sticky__value" id="stickyPCB">RM 0.00</div>
+    </div>
+    <div class="sticky__right">
+      <div class="sticky__label">Gaji bersih</div>
+      <div class="sticky__value sticky__value--small" id="stickyBersih">—</div>
+    </div>
+    <a href="#sec-result" class="btn">Lihat</a>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
